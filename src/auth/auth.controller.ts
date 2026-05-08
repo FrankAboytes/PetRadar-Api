@@ -1,0 +1,31 @@
+import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { AuthService } from './auth.service';
+import { RegisterDto, LoginDto } from './auth.dto';
+import { JwtAuthGuard } from '../common/jwt-auth.guard';
+
+@ApiTags('🔐 Auth')
+@Controller('auth')
+export class AuthController {
+  constructor(private authService: AuthService) {}
+
+  @Post('register')
+  @ApiOperation({ summary: 'Registrar nuevo usuario' })
+  register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto);
+  }
+
+  @Post('login')
+  @ApiOperation({ summary: 'Iniciar sesión' })
+  login(@Body() dto: LoginDto) {
+    return this.authService.login(dto);
+  }
+
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Obtener perfil del usuario autenticado' })
+  profile(@Req() req: any) {
+    return this.authService.getProfile(req.user.userId);
+  }
+}

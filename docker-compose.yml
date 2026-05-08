@@ -1,0 +1,71 @@
+# PetRadar Pro — Docker Compose
+# PostgreSQL + PostGIS, MongoDB, Redis + NestJS API
+
+
+services:
+  postgres:
+    image: postgis/postgis:15-3.3
+    container_name: petradar-postgres
+    environment:
+      POSTGRES_DB: petradar_db
+      POSTGRES_USER: petuser
+      POSTGRES_PASSWORD: petpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U petuser -d petradar_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:7
+    container_name: petradar-mongo
+    environment:
+      MONGO_INITDB_DATABASE: petradar_health
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: petradar-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build: .
+    container_name: petradar-api
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://petuser:petpassword@postgres:5432/petradar_db
+      MONGO_URL: mongodb://mongodb:27017/petradar_health
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: petradar-supersecret-jwt-key-2026
+      APPINSIGHTS_INSTRUMENTATIONKEY: ${APPINSIGHTS_INSTRUMENTATIONKEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  mongodata:
