@@ -23,6 +23,10 @@ export class User {
   phone: string;
 
   @ApiProperty()
+  @Column({ nullable: true })
+  city: string;
+
+  @ApiProperty()
   @CreateDateColumn()
   createdAt: Date;
 }

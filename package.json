@@ -38,6 +38,7 @@
     "class-validator": "^0.15.1",
     "compression": "^1.8.1",
     "helmet": "^8.1.0",
+    "ioredis": "^5.10.1",
     "mongodb": "^7.2.0",
     "mongoose": "^9.6.1",
     "passport": "^0.7.0",
@@ -45,7 +46,8 @@
     "pg": "^8.20.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.28"
+    "typeorm": "^0.3.28",
+    "winston": "^3.19.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -88,5 +90,10 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "overrides": {
+    "typeorm": {
+      "mongodb": "$mongodb"
+    }
   }
 }

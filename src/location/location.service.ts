@@ -17,7 +17,7 @@ export class LocationService {
   async searchNearby(lat: number, lng: number, radiusMeters: number = 500) {
     const result = await this.lostRepo
       .createQueryBuilder('lp')
-      .leftJoin('pets', 'p', 'p.id = lp.petId')
+      .leftJoin('pets', 'p', 'p.id::text = lp."petId"')
       .select([
         'lp.id', 'lp.description', 'lp.lat', 'lp.lng', 'lp.createdAt',
         'lp.petId',

@@ -1,5 +1,4 @@
-import { Controller, Get, Post, Delete, Param, Body, UseGuards, Req, UseInterceptors } from '@nestjs/common';
-import { CacheInterceptor } from '@nestjs/cache-manager';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Req, Query } from '@nestjs/common';
 
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { PetsService } from './pets.service';
@@ -54,10 +53,17 @@ export class PetsController {
   }
 
   @Get('lost-pets')
-  @UseInterceptors(CacheInterceptor)
-  @ApiOperation({ summary: 'Listar mascotas perdidas (🟢 Cache Redis)' })
-  getLostPets() {
-    return this.petsService.getLostPets();
+  @ApiOperation({ summary: 'Listar mascotas perdidas con distancias' })
+  getLostPets(@Query('lat') lat?: number, @Query('lng') lng?: number) {
+    return this.petsService.getLostPets(lat, lng);
+  }
+
+  @Patch('lost-pets/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Marcar mascota como encontrada (dueño confirma)' })
+  markFound(@Param('id') id: string) {
+    return this.petsService.markLostAsFound(id);
   }
 
   @Post('found-pets')
@@ -69,9 +75,16 @@ export class PetsController {
   }
 
   @Get('found-pets')
-  @UseInterceptors(CacheInterceptor)
   @ApiOperation({ summary: 'Listar mascotas encontradas (🟢 Cache Redis)' })
   getFoundPets() {
     return this.petsService.getFoundPets();
+  }
+
+  @Post('found-pets/:id/confirm')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Confirmar que la mascota fue encontrada y darla de baja' })
+  confirmFound(@Param('id') id: string) {
+    return this.petsService.confirmFound(id);
   }
 }

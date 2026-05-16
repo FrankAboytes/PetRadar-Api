@@ -40,6 +40,11 @@ export class AuthService {
     return this.userRepo.findOne({ where: { id } });
   }
 
+  async updateProfile(id: string, data: any) {
+    await this.userRepo.update(id, data);
+    return this.userRepo.findOne({ where: { id } });
+  }
+
   private token(user: User) {
     const payload = { sub: user.id, email: user.email };
     return {
