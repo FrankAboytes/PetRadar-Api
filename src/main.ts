@@ -3,27 +3,40 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
-import * as appInsights from 'applicationinsights';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+import { useAzureMonitor } from '@azure/monitor-opentelemetry';
+
+// Cargar .env desde la raíz del proyecto
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 async function bootstrap() {
-  // Azure Application Insights
-  if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
-    appInsights.setup(process.env.APPINSIGHTS_INSTRUMENTATIONKEY)
-      .setAutoDependencyCorrelation(true)
-      .setAutoCollectRequests(true)
-      .setAutoCollectPerformance(true, true)
-      .setAutoCollectExceptions(true)
-      .start();
-    console.log('📊 Application Insights activado');
+  // Azure Application Insights + Live Metrics (OpenTelemetry)
+  const appInsightsKey = process.env.APPINSIGHTS_INSTRUMENTATIONKEY;
+  console.log('🔑 AppInsights key:', appInsightsKey ? appInsightsKey.substring(0, 40) + '...' : 'NO ENCONTRADA');
+  
+  if (appInsightsKey) {
+    try {
+      useAzureMonitor({
+        azureMonitorExporterOptions: { connectionString: appInsightsKey },
+        enableLiveMetrics: true,
+        enableStandardMetrics: true,
+        enableTraceBasedSamplingForLogs: true,
+      });
+      console.log('📊 Application Insights + Live Metrics activado → petradar-incident-telemetry');
+    } catch (err: any) {
+      console.error('❌ AppInsights error:', err.message);
+    }
+  } else {
+    console.log('⚠️ APPINSIGHTS_INSTRUMENTATIONKEY no configurada en .env');
   }
-  const app = await NestFactory.create(AppModule);
 
+  const app = await NestFactory.create(AppModule);
   app.use(helmet());
   app.enableCors();
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
-  // Swagger docs
   const config = new DocumentBuilder()
     .setTitle('PetRadar Pro API')
     .setDescription('🐾 Microservicios para gestión de mascotas, búsqueda geoespacial y monitoreo de salud')

@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Req, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Req, Query, UseInterceptors } from '@nestjs/common';
 
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { PetsService } from './pets.service';
 import { CreatePetDto, CreateLostDto, CreateFoundDto } from './pets.dto';
 import { JwtAuthGuard } from '../common/jwt-auth.guard';
-
+import { CacheInterceptor } from '@nestjs/cache-manager';
 @ApiTags('🐾 Pets (SQL - PostgreSQL)')
 @Controller()
 export class PetsController {
@@ -53,6 +53,7 @@ export class PetsController {
   }
 
   @Get('lost-pets')
+  @UseInterceptors(CacheInterceptor)
   @ApiOperation({ summary: 'Listar mascotas perdidas con distancias' })
   getLostPets(@Query('lat') lat?: number, @Query('lng') lng?: number) {
     return this.petsService.getLostPets(lat, lng);
@@ -67,6 +68,7 @@ export class PetsController {
   }
 
   @Post('found-pets')
+  @UseInterceptors(CacheInterceptor)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Reportar mascota encontrada (🔍 búsqueda por radio 500m)' })

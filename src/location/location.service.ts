@@ -27,7 +27,7 @@ export class LocationService {
         `ST_Distance(lp.location::geography, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography)`,
         'distance_meters',
       )
-      .where('lp.is_active = true')
+      .where('lp."isActive" = true')
       .andWhere(
         `ST_DWithin(lp.location::geography, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :radius)`,
       )
@@ -47,7 +47,7 @@ export class LocationService {
     return this.lostRepo
       .createQueryBuilder('lp')
       .select(['lp.id', 'lp.description', 'lp.lat', 'lp.lng', 'lp.createdAt'])
-      .where('lp.is_active = true')
+      .where('lp."isActive" = true')
       .getMany();
   }
 }

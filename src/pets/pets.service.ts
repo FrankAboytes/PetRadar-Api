@@ -116,7 +116,7 @@ export class PetsService {
     return this.lostRepo
       .createQueryBuilder('lp')
       .leftJoin('pets', 'p', 'p.id::text = lp."petId"')
-      .where('lp.is_active = :active', { active: true })
+      .where('lp."isActive" = :active', { active: true })
       .andWhere(
         `ST_DWithin(lp.location::geography, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, 500)`,
         { lng, lat },
