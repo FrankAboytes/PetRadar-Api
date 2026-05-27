@@ -32,16 +32,44 @@ import { LocationModule } from './location/location.module';
       }),
     }),
 
-    // Redis Cache
+    // Redis Cache (opcional — fallback si no hay Redis disponible)
     CacheModule.registerAsync({
       isGlobal: true,
       inject: [ConfigService],
-      useFactory: async (config: ConfigService) => ({
-        store: await redisStore({
-          url: config.get('REDIS_URL', 'redis://localhost:6379'),
-          ttl: 60 * 1000,
-        }),
-      }),
+      useFactory: async (config: ConfigService) => {
+        const redisUrl = config.get('REDIS_URL');
+        
+        // Si no hay REDIS_URL configurada, usar cache en memoria
+        if (!redisUrl) {
+          console.warn('⚠️  REDIS_URL no configurada → usando cache en memoria (no persiste)');
+          console.warn('   Para Railway: agrega un servicio Redis y configura REDIS_URL');
+          return { ttl: 60 * 1000, max: 100 };
+        }
+        
+        // Intentar conectar a Redis, fallback a memoria si falla
+        try {
+          return {
+            store: await redisStore({
+              url: redisUrl,
+              ttl: 60 * 1000,
+              socket: {
+                reconnectStrategy: (retries) => {
+                  if (retries > 3) {
+                    console.warn('⚠️  Redis no disponible despues de 3 intentos → cache en memoria');
+                    return false;
+                  }
+                  return Math.min(retries * 1000, 3000);
+                },
+                connectTimeout: 5000,
+              },
+            }),
+          };
+        } catch (error) {
+          console.warn('⚠️  Error conectando a Redis:', (error as any)?.message);
+          console.warn('   La app funciona sin Redis (cache en memoria)');
+          return { ttl: 60 * 1000, max: 100 };
+        }
+      },
     }),
 
     AuthModule,
