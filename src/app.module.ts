@@ -16,12 +16,30 @@ import { LocationModule } from './location/location.module';
     // SQL: PostgreSQL + PostGIS
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        url: config.get('DATABASE_URL', 'postgresql://petuser:petpassword@localhost:5432/petradar_db'),
-        autoLoadEntities: true,
-        synchronize: true,
-      }),
+      useFactory: (config: ConfigService) => {
+        const databaseUrl = config.get('DATABASE_URL');
+        
+        if (databaseUrl) {
+          return {
+            type: 'postgres',
+            url: databaseUrl,
+            autoLoadEntities: true,
+            synchronize: true,
+          };
+        }
+        
+        // Fallback using individual env vars
+        return {
+          type: 'postgres',
+          host: config.get('PGHOST', 'localhost'),
+          port: parseInt(config.get('PGPORT', '5432'), 10),
+          username: config.get('PGUSER', 'petuser'),
+          password: config.get('PGPASSWORD', 'petpassword'),
+          database: config.get('PGDATABASE', 'petradar_db'),
+          autoLoadEntities: true,
+          synchronize: true,
+        };
+      },
     }),
 
     // NoSQL: MongoDB
@@ -80,3 +98,4 @@ import { LocationModule } from './location/location.module';
   ],
 })
 export class AppModule {}
+
