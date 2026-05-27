@@ -46,8 +46,16 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(3000);
-  console.log('🐾 PetRadar Pro API running on http://localhost:3000');
-  console.log('📚 Swagger docs: http://localhost:3000/api/docs');
+  // ==================== CAMBIO AQUÍ ====================
+  // 1. Railway inyecta de manera dinámica la variable PORT. Si no existe, usamos la 3000 para local.
+  const port = process.env.PORT || 3000;
+  
+  // 2. Escuchamos en el host '0.0.0.0'. Esto le dice al contenedor que acepte peticiones externas 
+  // entrantes directas de Railway en lugar de cerrarse solo a solicitudes locales (localhost).
+  await app.listen(port, '0.0.0.0');
+  
+  console.log(`🐾 PetRadar Pro API running on port: ${port}`);
+  console.log(`📚 Swagger docs disponible en /api/docs`);
+  // =====================================================
 }
 bootstrap();
