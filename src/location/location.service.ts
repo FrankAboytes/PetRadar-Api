@@ -11,10 +11,13 @@ export class LocationService {
   ) {}
 
   /**
-   * Búsqueda por radio: encuentra mascotas perdidas activas dentro de X metros
-   * usando ST_DWithin de PostGIS con cast a ::geography
+   * Búsqueda por radio simple: encuentra mascotas perdidas activas dentro de X metros
+   * usando cálculo de distancia simple (sin PostGIS)
+   * ~0.0045 grados ≈ 500 metros
    */
   async searchNearby(lat: number, lng: number, radiusMeters: number = 500) {
+    const radiusInDegrees = radiusMeters / 111000; // Conversión aproximada
+
     const result = await this.lostRepo
       .createQueryBuilder('lp')
       .leftJoin('pets', 'p', 'p.id::text = lp."petId"')
@@ -24,14 +27,13 @@ export class LocationService {
         'p.name as pet_name', 'p.species as pet_species', 'p."photoUrl" as pet_photo',
       ])
       .addSelect(
-        `ST_Distance(lp.location::geography, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography)`,
+        `SQRT(POWER(lp.lat - :lat, 2) + POWER(lp.lng - :lng, 2)) * 111000`,
         'distance_meters',
       )
       .where('lp."isActive" = true')
-      .andWhere(
-        `ST_DWithin(lp.location::geography, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :radius)`,
-      )
-      .setParameters({ lng, lat, radius: radiusMeters })
+      .andWhere('ABS(lp.lat - :lat) < :radius', { lat, radius: radiusInDegrees })
+      .andWhere('ABS(lp.lng - :lng) < :radius', { lng, radius: radiusInDegrees })
+      .setParameters({ lng, lat })
       .orderBy('distance_meters', 'ASC')
       .getRawMany();
 
@@ -51,3 +53,4 @@ export class LocationService {
       .getMany();
   }
 }
+

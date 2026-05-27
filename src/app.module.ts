@@ -13,7 +13,7 @@ import { LocationModule } from './location/location.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
 
-    // SQL: PostgreSQL + PostGIS
+    // SQL: PostgreSQL (sin PostGIS)
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
@@ -24,7 +24,7 @@ import { LocationModule } from './location/location.module';
             type: 'postgres',
             url: databaseUrl,
             autoLoadEntities: true,
-            synchronize: true,
+            synchronize: false,
           };
         }
         
@@ -37,7 +37,7 @@ import { LocationModule } from './location/location.module';
           password: config.get('PGPASSWORD', 'petpassword'),
           database: config.get('PGDATABASE', 'petradar_db'),
           autoLoadEntities: true,
-          synchronize: true,
+          synchronize: false,
         };
       },
     }),

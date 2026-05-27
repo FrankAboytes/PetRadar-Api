@@ -24,10 +24,6 @@ export class LostPet {
   lng: number;
 
   @ApiProperty()
-  @Column({ type: 'geometry', spatialFeatureType: 'Point', srid: 4326, nullable: true })
-  location: any;
-
-  @ApiProperty()
   @Column({ default: true })
   isActive: boolean;
 
@@ -58,10 +54,6 @@ export class FoundPet {
   lng: number;
 
   @ApiProperty()
-  @Column({ type: 'geometry', spatialFeatureType: 'Point', srid: 4326, nullable: true })
-  location: any;
-
-  @ApiProperty()
   @Column({ nullable: true })
   matchedLostPetId: string;
 
@@ -72,3 +64,4 @@ export class FoundPet {
   @CreateDateColumn()
   createdAt: Date;
 }
+
