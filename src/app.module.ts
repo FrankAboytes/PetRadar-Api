@@ -43,15 +43,25 @@ import { ActivityLog, ActivityLogSchema } from './activity/activity.schema';
       }),
     }),
 
-    // NoSQL: MongoDB (3 collections)
+    // NoSQL: MongoDB (3 collections) — Atlas o local
     MongooseModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        uri: config.get('MONGO_URL'),
-        retryAttempts: 5,
-        retryDelay: 3000,
-        connectTimeoutMS: 10000,
-      }),
+      useFactory: (config: ConfigService) => {
+        const mongoUrl = config.get('MONGO_URL');
+        if (!mongoUrl) {
+          console.error('❌ MONGO_URL no configurada');
+          console.error('   Railway: agrega un servicio MongoDB o configura MONGO_URL');
+          throw new Error('MONGO_URL es requerida para iniciar la aplicacion');
+        }
+        console.log('🔗 MongoDB:', mongoUrl.replace(/\/\/.*@/, '//***@'));
+        return {
+          uri: mongoUrl,
+          retryAttempts: 5,
+          retryDelay: 3000,
+          connectTimeoutMS: 15000,
+          serverSelectionTimeoutMS: 15000,
+        };
+      },
     }),
 
     // Redis Cache (opcional — usa memoria si no hay Redis)
