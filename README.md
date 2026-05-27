@@ -134,6 +134,21 @@ docker compose up -d
 docker pull ghcr.io/FrankAboytes/petradar-api:latest
 ```
 
+## Deploy en Railway
+
+```bash
+# 1. Conectar repo de GitHub en Railway Dashboard
+# 2. Agregar servicios: PostgreSQL + MongoDB
+# 3. Variables de entorno (Railway las configura automaticamente):
+#    - DATABASE_URL (proveida por Railway PostgreSQL)
+#    - MONGO_URL (proveida por Railway MongoDB)
+#    - JWT_SECRET (generar manual)
+#    - REDIS_URL (opcional — agregar servicio Redis)
+#    - PORT=3000
+#    - NODE_ENV=production
+# 4. La app usa el archivo railway.toml para configuracion automatica
+```
+
 ## Variables de Entorno (.env)
 
 ```env

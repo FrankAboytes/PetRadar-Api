@@ -3,32 +3,54 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CacheModule } from '@nestjs/cache-manager';
-import { createCache } from 'cache-manager';
 import { AuthModule } from './auth/auth.module';
 import { PetsModule } from './pets/pets.module';
 import { HealthModule } from './health/health.module';
 import { LocationModule } from './location/location.module';
 
+// TypeORM entities
+import { User } from './auth/user.entity';
+import { Pet } from './pets/pet.entity';
+import { LostPet, FoundPet } from './pets/lost-found.entity';
+import { Breed } from './breeds/breed.entity';
+import { Notification } from './notifications/notification.entity';
+import { LocationHistory } from './locations/location.entity';
+import { CommunityReport } from './reports/report.entity';
+import { Veterinary } from './veterinaries/veterinary.entity';
+
+// Mongoose schemas
+import { HealthRecord, HealthRecordSchema } from './health/health.schema';
+import { ChatMessage, ChatMessageSchema } from './chat/chat.schema';
+import { ActivityLog, ActivityLogSchema } from './activity/activity.schema';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
 
-    // SQL: PostgreSQL + PostGIS
+    // SQL: PostgreSQL + PostGIS (12 entities)
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
-        url: config.get('DATABASE_URL', 'postgresql://petuser:petpassword@localhost:5432/petradar_db'),
-        autoLoadEntities: true,
-        synchronize: true,
+        url: config.get('DATABASE_URL'),
+        entities: [User, Pet, LostPet, FoundPet, Breed, Notification, LocationHistory, CommunityReport, Veterinary],
+        synchronize: true, // Auto-crea tablas en Railway
+        ssl: config.get('NODE_ENV') === 'production' ? { rejectUnauthorized: false } : false,
+        extra: {
+          max: 10,
+          connectionTimeoutMillis: 10000,
+        },
       }),
     }),
 
-    // NoSQL: MongoDB
+    // NoSQL: MongoDB (3 collections)
     MongooseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        uri: config.get('MONGO_URL', 'mongodb://localhost:27017/petradar_health'),
+        uri: config.get('MONGO_URL'),
+        retryAttempts: 5,
+        retryDelay: 3000,
+        connectTimeoutMS: 10000,
       }),
     }),
 

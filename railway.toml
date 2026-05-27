@@ -1,0 +1,13 @@
+# Railway deployment configuration
+[build]
+builder = "nixpacks"
+buildCommand = "npm install && npm run build"
+startCommand = "node dist/main"
+
+[deploy]
+healthcheckPath = "/api/docs"
+restartPolicyType = "ON_FAILURE"
+numReplicas = 1
+
+[service]
+port = 3000
