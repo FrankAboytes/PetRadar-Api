@@ -24,11 +24,11 @@ export class LocationHistory {
   address: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
+  @Column({ type: 'double precision', nullable: true })
   accuracy: number; // metros de precision GPS
 
   @ApiProperty()
-  @Column({ nullable: true })
+  @Column({ type: 'double precision', nullable: true })
   batteryLevel: number; // % bateria del AirTag/GPS tracker
 
   @ApiProperty()
