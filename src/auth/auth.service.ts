@@ -37,12 +37,32 @@ export class AuthService {
   }
 
   async getProfile(id: string) {
-    return this.userRepo.findOne({ where: { id } });
+    const user = await this.userRepo.findOne({ where: { id } });
+    if (user) {
+      const { password, ...safe } = user as any;
+      return safe;
+    }
+    return null;
   }
 
   async updateProfile(id: string, data: any) {
-    await this.userRepo.update(id, data);
-    return this.userRepo.findOne({ where: { id } });
+    // Filter out undefined/null values to avoid wiping existing data
+    const clean: any = {};
+    for (const key of ['name', 'phone', 'city']) {
+      if (data[key] !== undefined && data[key] !== null) {
+        clean[key] = data[key];
+      }
+    }
+    if (Object.keys(clean).length > 0) {
+      await this.userRepo.update(id, clean);
+    }
+    const user = await this.userRepo.findOne({ where: { id } });
+    if (user) {
+      // Don't return password
+      const { password, ...safe } = user as any;
+      return safe;
+    }
+    return null;
   }
 
   private token(user: User) {

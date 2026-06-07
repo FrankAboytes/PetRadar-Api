@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { PetsModule } from './pets/pets.module';
 import { HealthModule } from './health/health.module';
 import { LocationModule } from './location/location.module';
+import { CorrelationMiddleware } from './common/correlation.middleware';
 
 // TypeORM entities
 import { User } from './auth/user.entity';
@@ -111,4 +112,8 @@ import { ActivityLog, ActivityLogSchema } from './activity/activity.schema';
     LocationModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CorrelationMiddleware).forRoutes('*');
+  }
+}

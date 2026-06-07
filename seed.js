@@ -36,44 +36,44 @@ async function seed() {
   // 1. USERS (30 — variados)
   // ═══════════════════════════════════════════
   const userData = [
-    ['ana.garcia@email.com','Ana García','4641234567','Col. Centro'],
-    ['luis.hernandez@email.com','Luis Hernández','4642345678','Col. Bellavista'],
-    ['maria.lopez@email.com','María López','4643456789','Col. La Gloria'],
-    ['carlos.ruiz@email.com','Carlos Ruiz','4644567890','Col. Las Reinas'],
-    ['sofia.martinez@email.com','Sofía Martínez','4645678901','Col. El Deportivo'],
-    ['pedro.ramirez@email.com','Pedro Ramírez','4646789012','Col. La Moderna'],
-    ['laura.torres@email.com','Laura Torres','4647890123','Col. San Antonio'],
-    ['jorge.mendoza@email.com','Jorge Mendoza','4648901234','Fracc. Las Fuentes'],
-    ['diana.castro@email.com','Diana Castro','4649012345','Fracc. Los Pinos'],
-    ['roberto.flores@email.com','Roberto Flores','4641122334','Col. Obrera'],
-    ['elena.sanchez@email.com','Elena Sánchez','4642233445','Col. Guanajuato'],
-    ['miguel.aguilar@email.com','Miguel Aguilar','4643344556','Barrio de San Juan'],
-    ['patricia.morales@email.com','Patricia Morales','4644455667','Col. La Cruz'],
-    ['fernando.vargas@email.com','Fernando Vargas','4645566778','Fracc. Los Nogales'],
-    ['alejandra.diaz@email.com','Alejandra Díaz','4646677889','Col. San José'],
-    ['oscar.jimenez@email.com','Óscar Jiménez','4647788990','Col. El Rosario'],
-    ['claudia.medina@email.com','Claudia Medina','4648899001','Fracc. Arboledas'],
-    ['ricardo.ortega@email.com','Ricardo Ortega','4649900112','Col. Del Valle'],
-    ['carolina.gomez@email.com','Carolina Gómez','4641011123','Col. San Pedro'],
-    ['hector.reyes@email.com','Héctor Reyes','4642122234','Fracc. Villa Verde'],
-    ['veronica.guzman@email.com','Verónica Guzmán','4643233345','Col. El Pirul'],
-    ['arturo.navarro@email.com','Arturo Navarro','4644344456','Col. Lázaro Cárdenas'],
-    ['monica.rivera@email.com','Mónica Rivera','4645455567','Fracc. La Luz'],
-    ['raul.contreras@email.com','Raúl Contreras','4646566678','Col. Guadalupe'],
-    ['gabriela.vega@email.com','Gabriela Vega','4647677789','Col. Santa María'],
-    ['alberto.campos@email.com','Alberto Campos','4648788890','Barrio de Santiago'],
-    ['adriana.soto@email.com','Adriana Soto','4649899901','Fracc. San Javier'],
-    ['eduardo.leon@email.com','Eduardo León','4640900012','Col. Insurgentes'],
-    ['marisol.delgado@email.com','Marisol Delgado','4641911123','Col. El Campanario'],
-    ['francisco.lara@email.com','Francisco Lara','4642922234','Fracc. Hacienda'],
+    ['ana.garcia@email.com','Ana García','4641234567'],
+    ['luis.hernandez@email.com','Luis Hernández','4642345678'],
+    ['maria.lopez@email.com','María López','4643456789'],
+    ['carlos.ruiz@email.com','Carlos Ruiz','4644567890'],
+    ['sofia.martinez@email.com','Sofía Martínez','4645678901'],
+    ['pedro.ramirez@email.com','Pedro Ramírez','4646789012'],
+    ['laura.torres@email.com','Laura Torres','4647890123'],
+    ['jorge.mendoza@email.com','Jorge Mendoza','4648901234'],
+    ['diana.castro@email.com','Diana Castro','4649012345'],
+    ['roberto.flores@email.com','Roberto Flores','4641122334'],
+    ['elena.sanchez@email.com','Elena Sánchez','4642233445'],
+    ['miguel.aguilar@email.com','Miguel Aguilar','4643344556'],
+    ['patricia.morales@email.com','Patricia Morales','4644455667'],
+    ['fernando.vargas@email.com','Fernando Vargas','4645566778'],
+    ['alejandra.diaz@email.com','Alejandra Díaz','4646677889'],
+    ['oscar.jimenez@email.com','Óscar Jiménez','4647788990'],
+    ['claudia.medina@email.com','Claudia Medina','4648899001'],
+    ['ricardo.ortega@email.com','Ricardo Ortega','4649900112'],
+    ['carolina.gomez@email.com','Carolina Gómez','4641011123'],
+    ['hector.reyes@email.com','Héctor Reyes','4642122234'],
+    ['veronica.guzman@email.com','Verónica Guzmán','4643233345'],
+    ['arturo.navarro@email.com','Arturo Navarro','4644344456'],
+    ['monica.rivera@email.com','Mónica Rivera','4645455567'],
+    ['raul.contreras@email.com','Raúl Contreras','4646566678'],
+    ['gabriela.vega@email.com','Gabriela Vega','4647677789'],
+    ['alberto.campos@email.com','Alberto Campos','4648788890'],
+    ['adriana.soto@email.com','Adriana Soto','4649899901'],
+    ['eduardo.leon@email.com','Eduardo León','4640900012'],
+    ['marisol.delgado@email.com','Marisol Delgado','4641911123'],
+    ['francisco.lara@email.com','Francisco Lara','4642922234'],
   ];
   console.log('👤 Creando 30 usuarios...');
   const userIds = [];
-  for (const [email, name, phone, city] of userData) {
+  for (const [email, name, phone] of userData) {
     const r = await pg.query(
-      `INSERT INTO users (id, email, password, name, phone, city, "createdAt")
-       VALUES (gen_random_uuid(), $1, '$2b$10$simulatedhashdummy', $2, $3, $4, NOW() - interval '1 day' * floor(random()*90+1))
-       RETURNING id`, [email, name, phone, city]
+      `INSERT INTO users (id, email, password, name, phone, "createdAt")
+       VALUES (gen_random_uuid(), $1, '$2b$10$simulatedhashdummy', $2, $3, NOW() - interval '1 day' * floor(random()*90+1))
+       RETURNING id`, [email, name, phone]
     );
     userIds.push(r.rows[0].id);
   }
@@ -188,20 +188,22 @@ async function seed() {
   }
 
   // ═══════════════════════════════════════════
-  // 5. FOUND PETS (8 — en Salamanca)
+  // 5. FOUND PETS (8 — matched to lost pets)
   // ═══════════════════════════════════════════
   console.log('📢 Creando 8 reportes de mascotas encontradas...');
+  // Get lost pet IDs for matching
+  const { rows: lostRows } = await pg.query('SELECT id, "petId" FROM lost_pets');
   for (let i = 0; i < 8; i++) {
     const c = nearby(Math.floor(i/2));
-    const randomPetIdx = 10 + i;
+    const linkedLost = lostRows[i % lostRows.length];
     await pg.query(
       `INSERT INTO found_pets (id, "petId", description, lat, lng, location, "matchedLostPetId", "matchDistance", "createdAt")
        VALUES (gen_random_uuid(), $1, $2, $3, $4,
          ST_SetSRID(ST_MakePoint($5, $4), 4326), $6, $7,
          NOW() - interval '1 day' * floor(random()*5+1))`,
-      [petRows[randomPetIdx % 26].id,
-       `Encontrado en Salamanca. Parece ser un ${breeds[randomPetIdx%26]} ${species[randomPetIdx%26]==='dog'?'perro':'gato'}. Está en buen estado. Contactar para recuperarlo.`,
-       c.lat, c.lng, c.lng, petRows[(10+i+5)%10].id, +(100 + Math.random()*400).toFixed(1)]
+      [null,
+       `Encontrado en Salamanca. Parece ser un animal doméstico. Está en buen estado. Contactar para recuperarlo.`,
+       c.lat, c.lng, c.lng, linkedLost.id, +(100 + Math.random()*400).toFixed(1)]
     );
   }
 

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Pet } from './pet.entity';
@@ -98,14 +98,37 @@ export class PetsService {
   }
 
   async getFoundPets() {
-    return this.foundRepo.find({ order: { createdAt: 'DESC' } });
+    const founds = await this.foundRepo.find({ order: { createdAt: 'DESC' } });
+    
+    // Enriquecer con ownerId via consulta separada
+    const enriched: any[] = [];
+    for (const f of founds) {
+      let ownerId: string | null = null;
+      if (f.matchedLostPetId) {
+        const lostPet = await this.lostRepo.findOne({ where: { id: f.matchedLostPetId as any } });
+        if (lostPet?.petId) {
+          const pet = await this.petRepo.findOne({ where: { id: lostPet.petId } });
+          ownerId = pet?.ownerId || null;
+        }
+      }
+      enriched.push({ ...f, ownerId });
+    }
+    return enriched;
   }
 
-  async confirmFound(foundId: string) {
+  async confirmFound(foundId: string, userId: string) {
     const found = await this.foundRepo.findOne({ where: { id: foundId } });
     if (!found) throw new NotFoundException('Reporte no encontrado');
-    // Marcar la mascota perdida vinculada como inactiva
+    
+    // Verificar que el dueño de la mascota es quien confirma
     if (found.matchedLostPetId) {
+      const lost = await this.lostRepo.findOne({ where: { id: found.matchedLostPetId } });
+      if (lost) {
+        const pet = await this.petRepo.findOne({ where: { id: lost.petId } });
+        if (!pet || pet.ownerId !== userId) {
+          throw new ForbiddenException('Solo el dueño de la mascota puede confirmar el encuentro');
+        }
+      }
       await this.lostRepo.update(found.matchedLostPetId, { isActive: false });
     }
     return { message: '✅ Mascota confirmada como encontrada', found };
