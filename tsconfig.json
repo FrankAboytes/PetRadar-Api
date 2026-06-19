@@ -33,5 +33,6 @@
     // ═══ Exactitud ═══
     "exactOptionalPropertyTypes": false,
     "noImplicitOverride": true
-  }
+  },
+  "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
 }
