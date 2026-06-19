@@ -188,3 +188,39 @@ curl -I localhost:3000/health | grep correlation # Correlation ID
 | 11.1 Logging | 6/6 | 6 | ✅ |
 
 **Total: 13/14 secciones cumplidas** ✅
+
+### 11.1 — RED Metrics + Dashboard en Tiempo Real ✅
+
+```bash
+# REQUISITO: Backend corriendo
+
+# 1. Ver RED metrics por endpoint
+curl http://localhost:3000/monitoring/metrics | python3 -m json.tool
+
+# 2. Ver resumen del sistema
+curl http://localhost:3000/monitoring/summary | python3 -m json.tool
+
+# 3. Ver métricas de BD
+curl http://localhost:3000/monitoring/database | python3 -m json.tool
+
+# 4. Health check completo
+curl http://localhost:3000/monitoring/health | python3 -m json.tool
+
+# 5. Abrir Dashboard visual en el frontend
+# http://localhost:5173/monitoring
+```
+
+**Dashboard en tiempo real (frontend):**
+- Cards: Uptime, Total Requests, Errores, Error Rate
+- Tabla RED por endpoint (Rate, Errors, Duration, Requests/60s)
+- Sección BD: tipo, estado, pool config
+- Sección errores: últimos errores capturados
+- Auto-refresh cada 10 segundos
+
+**Docker Compose para Prometheus + Grafana:**
+```bash
+cd ~/Documentos/Universidad/8toSemestre/Calidad\ de\ software
+docker compose -f docker-compose.monitoring.yml up -d
+# Grafana: http://localhost:3001 (admin/admin)
+# Prometheus: http://localhost:9090
+```

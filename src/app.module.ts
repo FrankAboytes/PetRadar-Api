@@ -1,4 +1,5 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -8,6 +9,8 @@ import { PetsModule } from './pets/pets.module';
 import { HealthModule } from './health/health.module';
 import { LocationModule } from './location/location.module';
 import { CorrelationMiddleware } from './common/correlation.middleware';
+import { MetricsInterceptor } from './common/metrics.interceptor';
+import { MonitoringModule } from './monitoring/monitoring.module';
 
 // TypeORM entities
 import { User } from './auth/user.entity';
@@ -107,6 +110,13 @@ import { Veterinary } from './veterinaries/veterinary.entity';
     PetsModule,
     HealthModule,
     LocationModule,
+    MonitoringModule,
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: MetricsInterceptor,
+    },
   ],
 })
 export class AppModule implements NestModule {
