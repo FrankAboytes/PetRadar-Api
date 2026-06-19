@@ -18,7 +18,8 @@ export class ChatMessage extends Document {
 
   @ApiProperty()
   @Prop({ required: true })
-  message: string;
+  message!: string;
+
 
   @ApiProperty()
   @Prop({ default: 'text' })
@@ -26,11 +27,13 @@ export class ChatMessage extends Document {
 
   @ApiProperty()
   @Prop({ default: false })
-  isRead: boolean;
+  isRead!: boolean;
+
 
   @ApiProperty()
   @Prop()
-  readAt: Date;
+  readAt!: Date;
+
 }
 
 export const ChatMessageSchema = SchemaFactory.createForClass(ChatMessage);

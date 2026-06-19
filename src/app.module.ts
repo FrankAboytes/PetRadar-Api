@@ -20,9 +20,6 @@ import { CommunityReport } from './reports/report.entity';
 import { Veterinary } from './veterinaries/veterinary.entity';
 
 // Mongoose schemas
-import { HealthRecord, HealthRecordSchema } from './health/health.schema';
-import { ChatMessage, ChatMessageSchema } from './chat/chat.schema';
-import { ActivityLog, ActivityLogSchema } from './activity/activity.schema';
 
 @Module({
   imports: [

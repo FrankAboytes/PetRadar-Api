@@ -5,70 +5,87 @@ import { ApiProperty } from '@nestjs/swagger';
 export class LostPet {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
+
 
   @ApiProperty()
   @Column()
-  petId: string;
+  petId!: string;
+
 
   @ApiProperty()
   @Column()
-  description: string;
+  description!: string;
+
 
   @ApiProperty({ description: 'Latitud donde se perdió' })
   @Column({ type: 'double precision' })
-  lat: number;
+  lat!: number;
+
 
   @ApiProperty({ description: 'Longitud donde se perdió' })
   @Column({ type: 'double precision' })
-  lng: number;
+  lng!: number;
+
 
   @ApiProperty()
   @Column({ type: 'geometry', spatialFeatureType: 'Point', srid: 4326, nullable: true })
-  location: any;
+  location!: any;
+
 
   @ApiProperty()
   @Column({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
+
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
+
 }
 
 @Entity('found_pets')
 export class FoundPet {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
+
 
   @ApiProperty()
   @Column({ nullable: true })
-  petId: string;
+  petId!: string;
+
 
   @ApiProperty()
   @Column()
-  description: string;
+  description!: string;
+
 
   @ApiProperty({ description: 'Latitud donde se encontró' })
   @Column({ type: 'double precision' })
-  lat: number;
+  lat!: number;
+
 
   @ApiProperty({ description: 'Longitud donde se encontró' })
   @Column({ type: 'double precision' })
-  lng: number;
+  lng!: number;
+
 
   @ApiProperty()
   @Column({ type: 'geometry', spatialFeatureType: 'Point', srid: 4326, nullable: true })
-  location: any;
+  location!: any;
+
 
   @ApiProperty()
   @Column({ nullable: true })
-  matchedLostPetId: string;
+  matchedLostPetId!: string;
+
 
   @ApiProperty()
   @Column({ type: 'double precision', nullable: true })
-  matchDistance: number;
+  matchDistance!: number;
+
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
+
 }

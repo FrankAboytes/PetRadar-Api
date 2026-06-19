@@ -5,11 +5,13 @@ import { ApiProperty } from '@nestjs/swagger';
 export class Pet {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
+
 
   @ApiProperty()
   @Column()
-  name: string;
+  name!: string;
+
 
   @ApiProperty()
   @Column()
@@ -17,32 +19,40 @@ export class Pet {
 
   @ApiProperty()
   @Column()
-  breed: string;
+  breed!: string;
+
 
   @ApiProperty()
   @Column({ nullable: true })
-  color: string;
+  color!: string;
+
 
   @ApiProperty()
   @Column({ type: 'int', nullable: true })
-  age: number;
+  age!: number;
+
 
   @ApiProperty()
   @Column({ nullable: true })
-  photoUrl: string;
+  photoUrl!: string;
+
 
   @ApiProperty()
   @Column({ nullable: true })
-  description: string;
+  description!: string;
+
 
   @ApiProperty()
   @Column()
-  ownerId: string;
+  ownerId!: string;
+
 
   @ApiProperty()
   @Column({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
+
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
+
 }

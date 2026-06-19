@@ -5,28 +5,35 @@ import { ApiProperty } from '@nestjs/swagger';
 export class User {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
+
 
   @ApiProperty()
   @Column({ unique: true })
-  email: string;
+  email!: string;
+
 
   @Column({ select: false })
-  password: string;
+  password!: string;
+
 
   @ApiProperty()
   @Column()
-  name: string;
+  name!: string;
+
 
   @ApiProperty()
   @Column({ nullable: true })
-  phone: string;
+  phone!: string;
+
 
   @ApiProperty()
   @Column({ nullable: true })
-  city: string;
+  city!: string;
+
 
   @ApiProperty()
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
+
 }

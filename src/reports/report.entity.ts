@@ -5,7 +5,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CommunityReport {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
+
 
   @ApiProperty()
   @Column()
@@ -13,11 +14,13 @@ export class CommunityReport {
 
   @ApiProperty()
   @Column()
-  title: string;
+  title!: string;
+
 
   @ApiProperty()
   @Column()
-  description: string;
+  description!: string;
+
 
   @ApiProperty()
   @Column()
@@ -25,19 +28,23 @@ export class CommunityReport {
 
   @ApiProperty()
   @Column({ type: 'double precision' })
-  latitude: number;
+  latitude!: number;
+
 
   @ApiProperty()
   @Column({ type: 'double precision' })
-  longitude: number;
+  longitude!: number;
+
 
   @ApiProperty()
   @Column({ nullable: true })
-  address: string;
+  address!: string;
+
 
   @ApiProperty()
   @Column({ nullable: true })
-  photoUrl: string;
+  photoUrl!: string;
+
 
   @ApiProperty()
   @Column({ default: 'pending' })
@@ -45,8 +52,10 @@ export class CommunityReport {
 
   @ApiProperty()
   @Column({ default: 0 })
-  upvotes: number;
+  upvotes!: number;
+
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
+
 }

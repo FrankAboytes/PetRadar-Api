@@ -1,0 +1,122 @@
+name: Security Audit
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday at 6:00 UTC
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  npm-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit (high + critical)
+        run: npm audit --audit-level=high
+        continue-on-error: true
+        id: audit
+
+      - name: Generate security report
+        if: always()
+        run: |
+          echo "## npm Audit Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          npm audit --json 2>/dev/null | python3 -c "
+import json,sys
+data=json.load(sys.stdin)
+if 'vulnerabilities' in data:
+    vulns = data['vulnerabilities']
+    for pkg, info in vulns.items():
+        if info['severity'] in ['high','critical']:
+            print(f'[{info[\"severity\"].upper()}] {pkg}: {info[\"via\"][0][\"title\"] if isinstance(info[\"via\"],list) and isinstance(info[\"via\"][0],dict) else \"see advisory\"}')
+else:
+    print('No vulnerabilities found')
+" 2>/dev/null || echo "Audit completed"
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  typescript-compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript strict check
+        run: npx tsc --noEmit
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: ESLint check
+        run: npx eslint src/ --ext .ts
+
+  coverage:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: petradar
+          POSTGRES_PASSWORD: petradar
+          POSTGRES_DB: petradar_test
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm run test:cov
+        env:
+          DATABASE_URL: postgresql://petradar:petradar@localhost:5432/petradar_test
+          MONGODB_URI: mongodb://localhost:27017/petradar_test
+          JWT_SECRET: ci-test-secret
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./coverage
+          fail_ci_if_error: false

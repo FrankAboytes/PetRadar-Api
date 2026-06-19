@@ -7,7 +7,7 @@ import { logger } from './logger.service';
 export class CorrelationMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     const correlationId = (req.headers['x-correlation-id'] as string) || uuidv4();
-    req['correlationId'] = correlationId;
+    (req as any)['correlationId'] = correlationId;
     res.setHeader('X-Correlation-ID', correlationId);
 
     const start = Date.now();

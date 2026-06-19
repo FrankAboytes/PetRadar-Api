@@ -16,10 +16,22 @@
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
+
+    // ═══ Strict Mode — PDF Section 2.2 ═══
+    "strict": true,
+    "noImplicitAny": true,
     "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": false,
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+
+    // ═══ Exactitud ═══
+    "exactOptionalPropertyTypes": false,
+    "noImplicitOverride": true
   }
 }

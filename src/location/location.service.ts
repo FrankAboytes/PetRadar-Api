@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { LostPet, FoundPet } from '../pets/lost-found.entity';
+import { LostPet } from '../pets/lost-found.entity';
 
 @Injectable()
 export class LocationService {
   constructor(
     @InjectRepository(LostPet) private lostRepo: Repository<LostPet>,
-    @InjectRepository(FoundPet) private foundRepo: Repository<FoundPet>,
   ) {}
 
   /**

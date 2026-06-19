@@ -5,7 +5,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class Notification {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
+
 
   @ApiProperty()
   @Column()
@@ -13,11 +14,13 @@ export class Notification {
 
   @ApiProperty()
   @Column()
-  title: string;
+  title!: string;
+
 
   @ApiProperty()
   @Column()
-  message: string;
+  message!: string;
+
 
   @ApiProperty()
   @Column()
@@ -33,12 +36,15 @@ export class Notification {
 
   @ApiProperty()
   @Column({ default: false })
-  isRead: boolean;
+  isRead!: boolean;
+
 
   @ApiProperty()
   @Column({ default: false })
-  isArchived: boolean;
+  isArchived!: boolean;
+
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
+
 }

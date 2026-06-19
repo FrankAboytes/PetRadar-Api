@@ -242,3 +242,20 @@
     </hashTree>
   </hashTree>
 </jmeterTestPlan>
+
+<!-- ═══════════════════════════════════════════
+     CÓMO EJECUTAR LOS DISTINTOS TIPOS DE PRUEBA
+     ═══════════════════════════════════════════
+
+     Load Test (10 min):
+       jmeter -n -t jmeter-test-plan.jmx -Jduration=600 -Jthreads=20
+
+     Stress Test (hasta quiebre):
+       jmeter -n -t jmeter-test-plan.jmx -Jduration=120 -Jthreads=100 -Jramp=30
+
+     Spike Test (pico repentino 10x):
+       jmeter -n -t jmeter-test-plan.jmx -Jduration=60 -Jthreads=200 -Jramp=5
+
+     Soak Test (2 horas):
+       jmeter -n -t jmeter-test-plan.jmx -Jduration=7200 -Jthreads=10 -Jramp=60
+-->

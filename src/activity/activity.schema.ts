@@ -6,7 +6,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class ActivityLog extends Document {
   @ApiProperty()
   @Prop({ required: true })
-  userId: string;
+  userId!: string;
+
 
   @ApiProperty()
   @Prop({ required: true })
@@ -26,11 +27,13 @@ export class ActivityLog extends Document {
 
   @ApiProperty()
   @Prop()
-  ipAddress: string;
+  ipAddress!: string;
+
 
   @ApiProperty()
   @Prop()
-  userAgent: string;
+  userAgent!: string;
+
 }
 
 export const ActivityLogSchema = SchemaFactory.createForClass(ActivityLog);

@@ -5,7 +5,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class Breed {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
+
 
   @ApiProperty()
   @Column()
@@ -17,9 +18,11 @@ export class Breed {
 
   @ApiProperty()
   @Column({ nullable: true })
-  description: string;
+  description!: string;
+
 
   @ApiProperty()
   @Column({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
+
 }

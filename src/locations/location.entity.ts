@@ -5,23 +5,28 @@ import { ApiProperty } from '@nestjs/swagger';
 export class LocationHistory {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
+
 
   @ApiProperty()
   @Column()
-  petId: string;
+  petId!: string;
+
 
   @ApiProperty()
   @Column({ type: 'double precision' })
-  latitude: number;
+  latitude!: number;
+
 
   @ApiProperty()
   @Column({ type: 'double precision' })
-  longitude: number;
+  longitude!: number;
+
 
   @ApiProperty()
   @Column({ nullable: true })
-  address: string;
+  address!: string;
+
 
   @ApiProperty()
   @Column({ type: 'double precision', nullable: true })
@@ -36,5 +41,6 @@ export class LocationHistory {
   source: string; // airtag, gps, manual, wifi_triangulation
 
   @CreateDateColumn()
-  recordedAt: Date;
+  recordedAt!: Date;
+
 }

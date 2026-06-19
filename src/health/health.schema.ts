@@ -6,7 +6,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class HealthRecord extends Document {
   @ApiProperty()
   @Prop({ required: true })
-  petId: string;
+  petId!: string;
+
 
   @ApiProperty()
   @Prop({ required: true })
@@ -14,11 +15,13 @@ export class HealthRecord extends Document {
 
   @ApiProperty()
   @Prop({ required: true })
-  description: string;
+  description!: string;
+
 
   @ApiProperty()
   @Prop()
-  veterinarian: string;
+  veterinarian!: string;
+
 
   @ApiProperty()
   @Prop({ type: Object })
@@ -30,11 +33,13 @@ export class HealthRecord extends Document {
 
   @ApiProperty()
   @Prop()
-  notes: string;
+  notes!: string;
+
 
   @ApiProperty()
   @Prop({ default: Date.now })
-  date: Date;
+  date!: Date;
+
 }
 
 export const HealthRecordSchema = SchemaFactory.createForClass(HealthRecord);

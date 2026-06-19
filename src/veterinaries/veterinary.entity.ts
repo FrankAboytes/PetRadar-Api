@@ -5,35 +5,43 @@ import { ApiProperty } from '@nestjs/swagger';
 export class Veterinary {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
+
 
   @ApiProperty()
   @Column()
-  name: string;
+  name!: string;
+
 
   @ApiProperty()
   @Column()
-  address: string;
+  address!: string;
+
 
   @ApiProperty()
   @Column({ type: 'double precision' })
-  latitude: number;
+  latitude!: number;
+
 
   @ApiProperty()
   @Column({ type: 'double precision' })
-  longitude: number;
+  longitude!: number;
+
 
   @ApiProperty()
   @Column({ nullable: true })
-  phone: string;
+  phone!: string;
+
 
   @ApiProperty()
   @Column({ nullable: true })
-  email: string;
+  email!: string;
+
 
   @ApiProperty()
   @Column({ nullable: true })
-  website: string;
+  website!: string;
+
 
   @ApiProperty()
   @Column({ default: 'general' })
@@ -45,12 +53,15 @@ export class Veterinary {
 
   @ApiProperty()
   @Column({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
+
 
   @ApiProperty()
   @Column({ default: 0 })
-  rating: number;
+  rating!: number;
+
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
+
 }
