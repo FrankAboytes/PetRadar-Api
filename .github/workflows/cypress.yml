@@ -1,0 +1,151 @@
+name: Cypress E2E Tests
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+  DATABASE_URL: 'postgresql://petradar:petradar@localhost:5432/petradar_test'
+  MONGODB_URI: 'mongodb://localhost:27017/petradar_test'
+  JWT_SECRET: 'test-secret-for-ci-1234567890'
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: petradar
+          POSTGRES_PASSWORD: petradar
+          POSTGRES_DB: petradar_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      # ═══ 1. Checkout backend ═══
+      - name: Checkout Backend
+        uses: actions/checkout@v4
+        with:
+          repository: FrankAboytes/PetRadar-Api
+          path: petradar-api
+          token: ${{ secrets.GH_TOKEN || github.token }}
+
+      # ═══ 2. Checkout frontend ═══
+      - name: Checkout Frontend
+        uses: actions/checkout@v4
+        with:
+          repository: FrankAboytes/PetRadar-Frontend
+          path: petradar-frontend
+          token: ${{ secrets.GH_TOKEN || github.token }}
+
+      # ═══ 3. Setup Node ═══
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            petradar-api/package-lock.json
+            petradar-frontend/package-lock.json
+
+      # ═══ 4. Install dependencies ═══
+      - name: Install Backend Dependencies
+        working-directory: petradar-api
+        run: npm ci
+
+      - name: Install Frontend Dependencies
+        working-directory: petradar-frontend
+        run: npm ci
+
+      # ═══ 5. Build backend ═══
+      - name: Build Backend
+        working-directory: petradar-api
+        run: npm run build
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          MONGODB_URI: ${{ env.MONGODB_URI }}
+          JWT_SECRET: ${{ env.JWT_SECRET }}
+
+      # ═══ 6. Start backend with DB sync ═══
+      - name: Start Backend
+        working-directory: petradar-api
+        run: |
+          node dist/main.js &
+          echo "PID=$!"
+          sleep 5
+          # Esperar a que el backend responda
+          for i in $(seq 1 30); do
+            if curl -s http://localhost:3000/health > /dev/null 2>&1; then
+              echo "✅ Backend ready on attempt $i"
+              break
+            fi
+            echo "⏳ Waiting for backend... attempt $i"
+            sleep 2
+          done
+
+      # ═══ 7. Start frontend ═══
+      - name: Start Frontend
+        working-directory: petradar-frontend
+        run: |
+          npx vite --port 5173 &
+          sleep 3
+          echo "Frontend starting..."
+
+      # ═══ 8. Run Cypress tests ═══
+      - name: Cypress E2E Tests
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: petradar-frontend
+          config-file: cypress.config.js
+          browser: chrome
+          headless: true
+          wait-on: 'http://localhost:5173'
+          wait-on-timeout: 60
+
+      # ═══ 9. Upload screenshots on failure ═══
+      - name: Upload Cypress Screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: petradar-frontend/cypress/screenshots
+          if-no-files-found: ignore
+
+      # ═══ 10. Upload videos ═══
+      - name: Upload Cypress Videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos
+          path: petradar-frontend/cypress/videos
+          if-no-files-found: ignore
+
+      # ═══ 11. Upload JUnit reports ═══
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-reports
+          path: petradar-frontend/cypress/reports
+          if-no-files-found: ignore
