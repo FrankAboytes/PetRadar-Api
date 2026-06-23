@@ -14,7 +14,8 @@ export class CorrelationMiddleware implements NestMiddleware {
     res.on('finish', () => {
       const duration = Date.now() - start;
       const level = res.statusCode >= 500 ? 'error' : res.statusCode >= 400 ? 'warn' : 'info';
-      logger.log(level, {
+      const msg = `${req.method} ${req.originalUrl} — ${res.statusCode} — ${duration}ms`;
+      logger.log(level, msg, {
         correlationId,
         method: req.method,
         url: req.originalUrl,

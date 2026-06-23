@@ -5,7 +5,7 @@ buildCommand = "npm install && npm run build"
 startCommand = "node dist/main"
 
 [deploy]
-healthcheckPath = "/api/docs"
+healthcheckPath = "/api/monitoring/health"
 restartPolicyType = "ON_FAILURE"
 numReplicas = 1
 
